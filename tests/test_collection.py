@@ -3,6 +3,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import pandas as pd
+
 from collectors.browser_collector import (
     _material_evidence,
     _title_matches_keyword,
@@ -11,6 +13,11 @@ from collectors.browser_collector import (
 from processors.material_identifier import identify_material
 from processors.material_identifier import identify_material_with_local_fallback
 from processors.ollama_material_identifier import suggest_from_product_name
+from processors.pdf_product_extractor import (
+    extract_product_name_candidates,
+    extract_product_names_from_pdf,
+)
+from processors.excel_product_extractor import extract_product_names_from_excel
 from storage import csv_manager
 
 
@@ -34,6 +41,45 @@ class CollectionUnitTests(unittest.TestCase):
         self.assertTrue(_title_matches_keyword("Blue RAL 5010 Powder Coating", "Blue RAL 5010 Powder"))
         self.assertFalse(_title_matches_keyword("Bentonite Powder", "Blue RAL 5010 Powder"))
         self.assertFalse(_title_matches_keyword("Cera-metal Putty For Powder Coating", "RAL 5010 Powder Coating"))
+
+    def test_pdf_extracts_product_name_label_without_using_description_as_name(self):
+        class FakePage:
+            def extract_text(self):
+                return "Product Name: PVC Water Pipe\nDescription: pressure pipe for water supply"
+
+        class FakeReader:
+            is_encrypted = False
+            pages = [FakePage()]
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as source:
+            with patch("processors.pdf_product_extractor.PdfReader", return_value=FakeReader()):
+                candidates, text = extract_product_name_candidates(source.name)
+        self.assertEqual(candidates, ["PVC Water Pipe"])
+        self.assertIn("Description:", text)
+
+    def test_pdf_auto_extracts_name_without_user_selection(self):
+        class FakePage:
+            def extract_text(self):
+                return "Product Name: PVC Water Pipe\nDescription: pressure pipe for water supply"
+
+        class FakeReader:
+            is_encrypted = False
+            pages = [FakePage()]
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as source:
+            with patch("processors.pdf_product_extractor.PdfReader", return_value=FakeReader()):
+                names = extract_product_names_from_pdf(source.name)
+        self.assertEqual(names, ["PVC Water Pipe"])
+
+    def test_excel_auto_extracts_product_name_column(self):
+        with tempfile.TemporaryDirectory() as directory:
+            workbook_path = str(Path(directory) / "products.xlsx")
+            pd.DataFrame([
+                {"Supplier": "ACME", "Product Name": "PVC Water Pipe", "Description": "Not a classifier input"},
+                {"Supplier": "Tools Co", "Product Name": "Brass Hex Bolt", "Description": "Not a classifier input"},
+            ]).to_excel(workbook_path, index=False)
+            names = extract_product_names_from_excel(workbook_path)
+        self.assertEqual(names, ["PVC Water Pipe", "Brass Hex Bolt"])
 
     def test_identifier_accepts_only_product_name(self):
         result = identify_material("PVC Water Pipe")

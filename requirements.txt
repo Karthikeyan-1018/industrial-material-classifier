@@ -1,5 +1,8 @@
 beautifulsoup4
+openpyxl
 pandas
 playwright
+pypdf
 python-dotenv
 requests
+xlrd
