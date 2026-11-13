@@ -1,0 +1,7 @@
+product_id,product_name,source_website,source_url,collected_date,material_evidence,candidate_primary_material,candidate_material_subtype,classification_status,classifier_source
+P0001,HDPE Industrial Pipe,IndiaMART,https://example.com/product1,2026-11-12,,,,,
+P0002,HDPE Industrial Pipe,Manual Test,,2026-11-12,,,,,
+005aacab-641a-425c-b6a9-27d707bd711c,DIN 6921 FLANGE BOLT,TradeIndia,https://www.tradeindia.com/products/din-6921-flange-bolt-c7282685.html,2026-11-12,"Material	Steel, Other",Metals,Carbon Steel,Candidate - Verify,Ollama qwen3:8b (product name only)
+48af9ba7-b586-40a2-bb02-f1b6e0647bd3,Is3589 Pipes Fe410,TradeIndia,https://www.tradeindia.com/products/is3589-pipes-fe410-c5508907.html,2026-11-12,Material	Fe410 Steel,Metals,Carbon Steel,Candidate - Verify,Ollama qwen3:8b (product name only)
+55ea09f6-1f9c-4dca-94fd-2398ad79416c,Namo Platinum Chair - With Arm Crystal - Color: Black,TradeIndia,https://www.tradeindia.com/products/namo-platinum-chair-with-arm-crystal-blk-c11948138.html,2026-11-12,,Plastics,ABS,Candidate - Verify,Ollama qwen3:8b (product name only)
+b785f02e-56d5-415f-9b62-2d8fba5b8357,"Abs Junction Box - Plastic, 100x100x70mm, White | IP67 Protection Level, 140 gm Weight, ABS Paint Finishing, Warranty Included",TradeIndia,https://www.tradeindia.com/products/abs-junction-box-c9948569.html,2026-11-12,Product Type	Abs Junction Box | Paint Finishing	Abs,Plastics,ABS,Candidate - Verify,Rules
